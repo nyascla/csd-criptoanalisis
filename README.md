@@ -17,16 +17,14 @@ Index Calculus es un método diseñado para resolver problemas de logaritmos dis
 ### 15 noviembre
 - https://upvedues.sharepoint.com/:v:/r/sites/PFT_DOC_34876_2024-Csd/Documentos%20compartidos/General/Recordings/Solo%20vista/Clase%20semanal%20de%20CSD-20241113_153949-Grabaci%C3%B3n%20de%20la%20reuni%C3%B3n.mp4?csf=1&web=1&e=kLlbHJ
 
-### 20 noviembre
+### 20 noviembre (BSGS)
 - https://engage.videoapuntes.upv.es/play/b796d1c0-a0c9-11ef-bcb1-cd3fbeb0d606
 
-### 22 noviembre
+### 22 noviembre (BSGS practica)
 - https://upvedues.sharepoint.com/:v:/r/sites/PFT_DOC_34876_2024-Csd/Documentos%20compartidos/General/Recordings/Solo%20vista/Clase%20semanal%20CSD-20241122_150230-Grabaci%C3%B3n%20de%20la%20reuni%C3%B3n.mp4?csf=1&web=1&e=2GqN4g
 
-### 27 noviembre
+### 27 noviembre (Pollard-rho)
 - https://upvedues.sharepoint.com/:v:/r/sites/PFT_DOC_34876_2024-Csd/Documentos%20compartidos/General/Recordings/Solo%20vista/Clase%20semanal%20de%20CSD-20241127_151640-Grabaci%C3%B3n%20de%20la%20reuni%C3%B3n%201.mp4?csf=1&web=1&e=drS9VH
-- https://upvedues.sharepoint.com/:v:/r/sites/PFT_DOC_34876_2024-Csd/Documentos%20compartidos/General/Recordings/Solo%20vista/Clase%20semanal%20de%20CSD-20241127_151640-Grabaci%C3%B3n%20de%20la%20reuni%C3%B3n.mp4?csf=1&web=1&e=b1lF6E
 
-### 29 noviembre
+### 29 noviembre (Index-calculus)
 - https://upvedues.sharepoint.com/:v:/r/sites/PFT_DOC_34876_2024-Csd/Documentos%20compartidos/General/Recordings/Solo%20vista/Clase%20semanal%20CSD-20241129_153135-Grabaci%C3%B3n%20de%20la%20reuni%C3%B3n%201.mp4?csf=1&web=1&e=jncfeF
-- https://upvedues.sharepoint.com/:v:/r/sites/PFT_DOC_34876_2024-Csd/Documentos%20compartidos/General/Recordings/Solo%20vista/Clase%20semanal%20CSD-20241129_153135-Grabaci%C3%B3n%20de%20la%20reuni%C3%B3n.mp4?csf=1&web=1&e=Qs1a3u

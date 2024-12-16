@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 # Configuración del logger
-def configurar_logger():
+def configurar_logger(path):
     """Configura el logger para escribir en la salida estándar y en un archivo."""
     logger = logging.getLogger("cli_logger")
     logger.setLevel(logging.DEBUG)
@@ -17,8 +17,8 @@ def configurar_logger():
     console_handler.setFormatter(formatter)
 
     # Handler para el archivo de log
-    fecha_hoy = datetime.now().strftime("%Y-%m-%d")
-    file_handler = logging.FileHandler(f"./logs/log_{fecha_hoy}.log")
+    fecha_hoy = datetime.now().replace(microsecond=0)
+    file_handler = logging.FileHandler(f"{path}/log_{fecha_hoy}.log")
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
 
