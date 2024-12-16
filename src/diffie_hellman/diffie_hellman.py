@@ -1,13 +1,50 @@
 import base64
+import json
+import os
+import time
+
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
+from src.const import MAGIA, DATASET_PATH
+from src.logger import configurar_logger
 
-def entero_a_bytes_16(entero):
+ruta_actual = os.path.abspath(__file__)
+directorio_actual = os.path.dirname(ruta_actual)
+
+logger = configurar_logger(directorio_actual)
+
+
+def test():
+    logger.info(f"\n{MAGIA} DIFFIE HELLMAN {MAGIA}")
+    logger.info(f"Data: n;alfa;beta;p;x;duracion")
+
+    with open(DATASET_PATH, 'r') as j:
+        d = json.load(j)
+
+    for talla, objetos in d.items():
+        for obj in objetos:
+            inicio = time.time()
+
+            n = obj["n"]
+            p = obj["p"]
+            alfa = obj["alfa"]
+            beta = obj["beta"]
+            orden = obj["orden"]
+
+            x = diffie_hellman(p, alfa)
+
+            fin = time.time()  # Registrar el tiempo final
+            duracion = fin - inicio
+
+            logger.info(f"{n};{alfa};{beta};{p};{x};{duracion:.6f}")
+
+
+def entero_a_bytes_32(entero):
     """
-    Convierte un entero en bytes de 16 bytes, rellenando con ceros si es necesario.
+    Convierte un entero en bytes de 32 bytes, rellenando con ceros si es necesario.
     """
-    return int.to_bytes(entero, 16, byteorder='big')
+    return int.to_bytes(entero, 32, byteorder='big')
 
 
 def encriptar(texto, clave):
@@ -15,7 +52,7 @@ def encriptar(texto, clave):
     Encripta un texto utilizando el algoritmo AES en modo ECB con la clave proporcionada.
     El texto debe ser una cadena de texto, y la clave un número entero.
     """
-    clave_bytes = entero_a_bytes_16(clave)
+    clave_bytes = entero_a_bytes_32(clave)
 
     # Convertir texto a bytes
     datos = texto.encode('utf-8')
@@ -23,7 +60,7 @@ def encriptar(texto, clave):
     # Crear un cifrador AES en modo ECB
     cipher = AES.new(clave_bytes, AES.MODE_ECB)
 
-    # Rellenar el texto hasta el tamaño múltiplo de 16 bytes
+    # Rellenar el texto hasta el tamaño múltiplo de 32 bytes
     datos_rellenados = pad(datos, AES.block_size)
 
     # Encriptar el texto
@@ -37,7 +74,7 @@ def desencriptar(texto_encriptado, clave):
     """
     Desencripta un texto previamente encriptado utilizando AES en modo ECB y la clave proporcionada.
     """
-    clave_bytes = entero_a_bytes_16(clave)
+    clave_bytes = entero_a_bytes_32(clave)
 
     # Decodificar el texto encriptado de base64
     ciphertext = base64.b64decode(texto_encriptado)
@@ -59,8 +96,8 @@ class Persona:
         """
         self.nombre = nombre
         self.secreto = secreto  # Secreto de la persona
-        self.primo = primo      # Número primo para Diffie-Hellman
-        self.base = base        # Base para Diffie-Hellman
+        self.primo = primo  # Número primo para Diffie-Hellman
+        self.base = base  # Base para Diffie-Hellman
         self.clave_publica = self.calcular_clave_publica()  # Clave pública calculada
 
     def calcular_clave_publica(self):
@@ -100,16 +137,17 @@ def diffie_hellman(primo, base):
 
     # Mensaje a intercambiar
     mensaje_original = "hola bob"
-    print(f"Mensaje original de Alice: {mensaje_original}")
+    # print(f"Mensaje original de Alice: {mensaje_original}")
 
     # Alice encripta el mensaje para Bob
     mensaje_encriptado = alice.encriptar_mensaje(bob.clave_publica, mensaje_original)
-    print(f"Mensaje encriptado: {mensaje_encriptado}")
+    # print(f"Mensaje encriptado: {mensaje_encriptado}")
 
     # Bob desencripta el mensaje de Alice
     mensaje_desencriptado = bob.desencriptar_mensaje(alice.clave_publica, mensaje_encriptado)
-    print(f"Mensaje desencriptado por Bob: {mensaje_desencriptado}")
+    # print(f"Mensaje desencriptado por Bob: {mensaje_desencriptado}")
 
+    return mensaje_original == mensaje_desencriptado
 
 if __name__ == "__main__":
     # Ejecutar el intercambio de mensajes con los parámetros de Diffie-Hellman
