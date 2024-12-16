@@ -114,10 +114,3 @@ def diffie_hellman(primo, base):
 if __name__ == "__main__":
     # Ejecutar el intercambio de mensajes con los parámetros de Diffie-Hellman
     diffie_hellman(primo=23, base=5)
-
-if __name__ == "__main__":
-    # base.test()
-    # bsgs.test()
-    # pollard_rho.test()
-
-    diffie_hellman(23, 5)
