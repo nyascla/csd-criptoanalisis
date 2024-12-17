@@ -136,8 +136,7 @@ def diffie_hellman(primo, base):
     bob = Persona(nombre="Bob", secreto=15, primo=primo, base=base)
 
     # Mensaje a intercambiar
-    mensaje_original = "hola bob"
-    # print(f"Mensaje original de Alice: {mensaje_original}")
+    mensaje_original = "En un lugar de la Mancha, de cuyo nombre no quiero acordarme..."
 
     # Alice encripta el mensaje para Bob
     mensaje_encriptado = alice.encriptar_mensaje(bob.clave_publica, mensaje_original)
@@ -149,6 +148,19 @@ def diffie_hellman(primo, base):
 
     return mensaje_original == mensaje_desencriptado
 
+
+def check():
+    a = 6
+    b = 15
+    p = 23
+    base = 5
+    x = ((base ** a) ** b) % p
+    y = ((base ** b) ** a) % p
+    print(f"PK: {x} PK: {y} OK: {x == y}")
+    assert x == y, "Error Garrafal"
+
+
 if __name__ == "__main__":
     # Ejecutar el intercambio de mensajes con los parámetros de Diffie-Hellman
+    # check()
     diffie_hellman(primo=23, base=5)
