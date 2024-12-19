@@ -5,8 +5,54 @@ Algoritmo Montecarlo: no determinista
 Procedure:
 
 """
+import json
 import random
+import time
 from math import gcd
+
+from src.const import MAGIA, DATASET_PATH
+from src.logger import configurar_logger
+
+
+def test(max_talla, n_talla):
+    logger = configurar_logger(__file__, __name__)
+    logger.info(f"\n{MAGIA} pollard_rho_log | talla:{max_talla} {MAGIA}")
+    logger.info(f"Data: n;alfa;beta;p;x;duracion")
+
+    with open(DATASET_PATH, 'r') as j:
+        d = json.load(j)
+
+    for talla, objetos in d.items():
+        if int(talla) > max_talla: return
+        c = 1
+        for obj in objetos:
+            if c > n_talla:
+                break
+
+            inicio = time.time()
+
+            n = obj["n"]
+            p = obj["p"]
+            alfa = obj["alfa"]
+            beta = obj["beta"]
+            orden = obj["orden"]
+
+            # if beta == 146970801:
+            #     print("pass")
+            #     continue
+
+            x = pollard_rho_log(alfa, beta, p, orden)
+
+            fin = time.time()  # Registrar el tiempo final
+            duracion = fin - inicio
+
+            if not x:
+                x = -1
+            logger.info(f"{n};{alfa};{beta};{p};{x};{duracion:.6f}")
+
+            # assert (((alfa ** x) % p) == beta), "error garrafal"
+
+            c += 1
 
 
 def pollard_rho_log(alpha, beta, p, orden):
@@ -45,7 +91,7 @@ def pollard_rho_log(alpha, beta, p, orden):
 
 
     # Empezamos con el algoritmo de Pollard-Rho
-    for _ in range(10000):  # Número máximo de iteraciones
+    for i in range(100000):  # Número máximo de iteraciones
         a1, b1 = f(x1, a1, b1)
         x1 = nx(x1, a1, b1)
 
@@ -59,8 +105,10 @@ def pollard_rho_log(alpha, beta, p, orden):
         if x1 == x2:
             v = (b1 - b2) + orden
             m = mod_inv(v, orden)
-            v = (a2 - a1) * m % orden
-            return v
+            if m:
+                v = (a2 - a1) * m % orden
+                if pow(alpha, v, p) == beta:
+                    return v
 
     return None
 
@@ -78,6 +126,7 @@ def mod_inv(a, m):
         return None  # No tiene inverso modular
     if t < 0:
         t = t + m
+
     return t
 
 

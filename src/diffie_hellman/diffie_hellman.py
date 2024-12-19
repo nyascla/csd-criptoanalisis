@@ -12,10 +12,12 @@ from src.logger import configurar_logger
 ruta_actual = os.path.abspath(__file__)
 directorio_actual = os.path.dirname(ruta_actual)
 
-logger = configurar_logger(directorio_actual)
+
 
 
 def test():
+    logger = configurar_logger(__file__, __name__)
+
     logger.info(f"\n{MAGIA} DIFFIE HELLMAN {MAGIA}")
     logger.info(f"Data: n;alfa;beta;p;x;duracion")
 
@@ -164,3 +166,4 @@ if __name__ == "__main__":
     # Ejecutar el intercambio de mensajes con los parámetros de Diffie-Hellman
     # check()
     diffie_hellman(primo=23, base=5)
+

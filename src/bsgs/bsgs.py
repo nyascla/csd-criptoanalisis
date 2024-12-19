@@ -6,28 +6,39 @@ import time
 from src.const import MAGIA, DATASET_PATH
 from src.logger import configurar_logger
 
-ruta_actual = os.path.abspath(__file__)
-directorio_actual = os.path.dirname(ruta_actual)
-
-logger = configurar_logger(directorio_actual)
 
 
-def test():
-    logger.info(f"\n{MAGIA} BABY STEP GIANT STEP {MAGIA}")
+def test(max_talla, n_talla):
+    logger = configurar_logger(__file__, __name__)
+    logger.info(f"\n{MAGIA} BABY STEP GIANT STEP talla:{max_talla} {MAGIA}")
     logger.info(f"Data: n;alfa;beta;p;x;duracion")
 
     with open(DATASET_PATH, 'r') as j:
         d = json.load(j)
 
     for talla, objetos in d.items():
+        if int(talla) > max_talla: return
+        c = 1
         for obj in objetos:
+            if c > n_talla:
+                break
+
+            inicio = time.time()
+
             n = obj["n"]
             p = obj["p"]
             alfa = obj["alfa"]
             beta = obj["beta"]
             orden = obj["orden"]
-            baby_step_giant_step(n, alfa, beta, p)
 
+            x = baby_step_giant_step(n, alfa, beta, p)
+
+            fin = time.time()  # Registrar el tiempo final
+            duracion = fin - inicio
+
+            logger.info(f"{n};{alfa};{beta};{p};{x};{duracion:.6f}")
+
+            c += 1
 
 def modinv(a, p):
     """Calcula el inverso modular de a módulo p usando el algoritmo extendido de Euclides."""
@@ -46,8 +57,6 @@ def modinv(a, p):
 
 def baby_step_giant_step(n, alfa, beta, p):
     """Algoritmo Baby-step Giant-step para resolver el logaritmo discreto: g^x = h (mod p)."""
-    inicio = time.time()
-
     # Paso 1: Preparar m = ceil(sqrt(p))
     m = math.isqrt(p) + 1
 
@@ -66,16 +75,8 @@ def baby_step_giant_step(n, alfa, beta, p):
     for i in range(m):
         if current in baby_steps:
             # Si encontramos un match, calculamos x = i * m + j
-            fin = time.time()  # Registrar el tiempo final
-            duracion = fin - inicio
             x = i * m + baby_steps[current]
-            logger.info(f"{n};{alfa};{beta};{p};{x};{duracion:.6f}")
             return x
         current = (current * g_m) % p
-
     # Si no se encontró una solución
-    fin = time.time()  # Registrar el tiempo final
-    duracion = fin - inicio
-    x = None
-    logger.info(f"{n};{alfa};{beta};{p};{x};{duracion:.6f}")
     return None

@@ -1,73 +1,85 @@
 import json
-import os
 import time
-from collections import Counter
-
-import matplotlib.pyplot as plt
 
 from src.const import MAGIA, DATASET_PATH
 from src.logger import configurar_logger
 
-ruta_actual = os.path.abspath(__file__)
-directorio_actual = os.path.dirname(ruta_actual)
 
-logger = configurar_logger(directorio_actual)
-
-def test():
-    logger.info(f"\n{MAGIA} FUERZA BRUTA {MAGIA}")
+def test(max_talla, n_talla):
+    logger = configurar_logger(__file__, __name__)
+    logger.info(f"\n{MAGIA} FUERZA BRUTA talla:{max_talla} {MAGIA}")
     logger.info(f"Data: n;alfa;beta;p;x;duracion")
 
     with open(DATASET_PATH, 'r') as j:
         d = json.load(j)
 
     for talla, objetos in d.items():
+        if int(talla) > max_talla: return
+        c = 1
         for obj in objetos:
+            if c > n_talla:
+                break
+            inicio = time.time()
+
             n = obj["n"]
             p = obj["p"]
             alfa = obj["alfa"]
             beta = obj["beta"]
             orden = obj["orden"]
-            logaritmo_discreto_fuerza_bruta(n, alfa, beta, p)
 
+            x = logaritmo_discreto_fuerza_bruta(alfa, beta, p)
 
-# Problema del logaritmo discreto: Encontrar x tal que g^x ≡ y (mod p)
-def logaritmo_discreto_fuerza_bruta(n ,alfa, beta, p):
-    """
-    Encontrar x tal que alfa^x ≡ beta (mod p)
-
-    :param alfa: base
-    :param beta: resultado conocido
-    :param p: número primo
-    :return: exponente que buscamos
-    """
-
-    inicio = time.time()
-    for x in range(p):  # Probar todos los valores posibles de x (de 0 a p-1)
-        if pow(alfa, x, p) == beta:  # Verificar si g^x mod p == y
             fin = time.time()  # Registrar el tiempo final
             duracion = fin - inicio
 
             logger.info(f"{n};{alfa};{beta};{p};{x};{duracion:.6f}")
+
+            c += 1
+
+
+# Problema del logaritmo discreto: Encontrar x tal que g^x ≡ y (mod p)
+def logaritmo_discreto_fuerza_bruta(alfa, beta, p):
+    """
+    Encontrar x tal que alfa^x ≡ beta (mod p)
+    """
+    for x in range(p):  # Probar todos los valores posibles de x (de 0 a p-1)
+        if pow(alfa, x, p) == beta:  # Verificar si g^x mod p == y
             return x
-
-    fin = time.time()
-    duracion = fin - inicio
-    x = None
-    logger.info(f"{n};{alfa};{beta};{p};{x};{duracion:.6f}")
-    return None  # Si no se encuentra una solución (teóricamente improbable si g es una base válida)
+    return None  # Si no se encuentra una solución (teóricamente improbable si alfga es una base válida)
 
 
-def demostrar_modulo_uniforme(primo, rango_a):
-    # Calcular los restos
-    restos = [a % primo for a in range(rango_a)]
+def es_grupo_uniforme(primo, base):
+    """
+    Comprueba si la base genera un grupo cíclico uniforme módulo un número primo.
+    """
+    elementos_generados = set()
+    for exponente in range(primo - 1):  # El orden de un grupo multiplicativo mod primo es primo-1
+        valor = pow(base, exponente, primo)  # base^exponente mod primo
+        elementos_generados.add(valor)
 
-    # Contar la frecuencia de cada resto
-    frecuencia_restos = Counter(restos)
+    # Si la cantidad de elementos generados es igual a primo-1, es un grupo cíclico uniforme
+    if len(elementos_generados) == primo - 1:
+        print(f"La base {base} forma un grupo cíclico uniforme módulo {primo}.")
+        return True
+    else:
+        print(f"La base {base} NO forma un grupo cíclico uniforme módulo {primo}.")
+        return False
 
-    # Mostrar resultados
-    print(f"Primo: {primo}")
-    print(f"Frecuencia de restos (módulo {primo}): {dict(frecuencia_restos)}")
 
-    # Verificar que los restos son uniformes
-    esperados = rango_a // primo
-    print(f"Frecuencia esperada (si es uniforme): {esperados}")
+def basic_test():
+    base = 5
+    congruente = 8
+    primo = 23
+
+    print(f"t tal que {base}^t ≡ {congruente} (mod {primo})")
+    print(f"Calculando...")
+    t = logaritmo_discreto_fuerza_bruta(alfa=base, beta=congruente, p=primo)
+
+    assert (base ** t) % primo == congruente, "Error Garrafal"
+    print(f"t: {t}")
+    print("(base ** t) % primo, congruente")
+    print(f"({base} ** {t}) % {primo} = {congruente}")
+
+
+if __name__ == "__main__":
+    pass

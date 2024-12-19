@@ -20,10 +20,52 @@ while no solucion
             - log_alfa beta + r = relacion lineal
             - return = log_alfa beta
 """
-
+import json
 import random
+import time
 
 import sympy
+
+from src.const import MAGIA, DATASET_PATH
+from src.logger import configurar_logger
+
+S = [2, 3, 5, 7]
+
+def test(max_talla, n_talla):
+    logger = configurar_logger(__file__, __name__)
+    logger.info(f"\n{MAGIA} index calculus | talla:{max_talla} {MAGIA}")
+    logger.info(f"Data: n;alfa;beta;p;x;duracion")
+
+    with open(DATASET_PATH, 'r') as j:
+        d = json.load(j)
+
+    for talla, objetos in d.items():
+        if int(talla) > max_talla: return
+        c = 1
+        for obj in objetos:
+            if c > n_talla:
+                break
+
+            inicio = time.time()
+
+            n = obj["n"]
+            p = obj["p"]
+            alfa = obj["alfa"]
+            beta = obj["beta"]
+            orden = obj["orden"]
+
+            # if beta == 146970801:
+            #     print("pass")
+            #     continue
+
+            x = index_calculus(alfa, beta, p, orden)
+
+            fin = time.time()  # Registrar el tiempo final
+            duracion = fin - inicio
+
+            logger.info(f"{n};{alfa};{beta};{p};{x};{duracion:.6f}")
+
+            c += 1
 
 
 def exp_mod(base, exponente, mod):
@@ -49,13 +91,13 @@ def is_s_smooth(n, max_p=7):
     return factores
 
 
-def build_smooths(p):
+def build_smooths(alfa, p):
     p_count = set()
     s_smooths = {}
     while len(p_count) < len(S):
-        r = random.randint(1, 10000)
+        r = random.randint(1, 1000000)
 
-        x = (alfa ** r) % p
+        x = pow(alfa, r, p)
         f = is_s_smooth(x)
         if f:
             s_smooths[r] = f
@@ -67,8 +109,6 @@ def build_smooths(p):
     #     if f:
     #         s_smooths[t] = f
     #         p_count.update(list(f.keys()))
-    print(p_count)
-    print(s_smooths)
     return s_smooths
 
 
@@ -97,16 +137,12 @@ def build_equations(s_smooths, orden):
     ]
 
     # Depuración: imprime ecuaciones y variables
-    print("Ecuaciones:", ecuaciones)
-    print("Variables dict:", variables_dict)
 
     # Resolver el sistema de ecuaciones
     solucion = sympy.solve(ecuaciones, list(variables_dict.values()))
     s = {}
-    print(solucion)
     for key, value in solucion.items():
         s[str(key)] = value % orden
-    print(s)
     return s
 
 
@@ -122,49 +158,90 @@ def solve(alfa, beta, p, orden, valores_log):
     # print(280 % orden)
     # print(280 - 102)
 
-    trial = 102
-    betaalfa = (beta * (alfa ** trial)) % p
-    print(betaalfa)
-    betaalfa_smooth = is_s_smooth(betaalfa)
-    print(betaalfa_smooth)
-    if betaalfa_smooth:
-        s = ""
-        for base, exponente in betaalfa_smooth.items():
-            if exponente == 1:
-                s += f"log{base}+"
-            else:
-                s += f"{exponente}*log{base}+"
-        s = s[:-1]
-        expresion = s
-        print(expresion)
-        print(valores_log)
-        resultado = eval(expresion, {}, valores_log)
-        print(resultado)
+    # trial = 102
 
-        return resultado - trial
+    for _ in range(1000):
+        trial = random.randrange(0, p)
+        # betaalfa = (beta * (alfa ** trial)) % p
+        # Exponentiación modular para calcular (alfa ** trial) % p
+        exp_mod = pow(alfa, trial, p)
+        # Calcular el resultado final: (beta * (alfa ** trial)) % p
+        betaalfa = (beta * exp_mod) % p
 
-        # beta * alfa**trial = betaalfa_smooth
+        betaalfa_smooth = is_s_smooth(betaalfa)
+        if betaalfa_smooth:
+            s = ""
+            for base, exponente in betaalfa_smooth.items():
+                if exponente == 1:
+                    s += f"log{base}+"
+                else:
+                    s += f"{exponente}*log{base}+"
+            s = s[:-1]
+            expresion = s
 
-    # log_alfa(beta) + trial * log_alfa(alfa) = 2*log2+log5
-    # x = valor - trial
+            resultado = eval(expresion, {}, valores_log)
+            r = resultado - trial
+            try:
+                return int(r)
+            except Exception as e:
+                return None
+        else:
+            pass
 
 
-def index_calculus(n, alfa, beta, p, orden):
-    s_smooths = build_smooths(p)
-    v = build_equations(s_smooths, orden)
-    result = solve(alfa, beta, p, orden, v)
-    print("@@@ SOLUTION @@@")
-    print(result)
+def index_calculus(alfa, beta, p, orden):
+    print(alfa)
+    for intentos in range(1000):
+        try:
+            print(1)
+            s_smooths = build_smooths(alfa, p)
+            print(2)
+            v = build_equations(s_smooths, orden)
+            print(3)
+            result = solve(alfa, beta, p, orden, v)
+            print(4)
+        except Exception as e:
+            # print(f"bbb: {e}")
+            result = None
+
+        if result:
+            if pow(alfa, int(result), p) == beta:
+                return result
+        else:
+            pass
+
+    return -777
 
 
 if __name__ == "__main__":
+    pass
     # Datos proporcionados
+
+    trial = 102
     p = 421
     alfa = 2
     beta = 412
     orden = 420
 
-    # Elegimos S
-    S = [2, 3, 5, 7]
+    # n = 16
+    # p = 48947
+    # alfa = 100
+    # beta = 44488
+    # orden = 24473
 
-    index_calculus(0, alfa, beta, p, orden)
+    # n = 16
+    # p = 48947
+    # alfa = 100
+    # beta = 35391
+    # orden = 24473
+
+    # n = 8
+    # p = 229
+    # alfa = 100
+    # beta = 81
+    # orden = 114
+    # x = nnn()
+    # x = index_calculus(alfa, beta, p, orden)
+
+    # if pow(alfa, int(x), p) == beta:
+    #     print("good")
