@@ -1,8 +1,8 @@
 import json
 import time
 
-from src.const import MAGIA, DATASET_PATH
-from src.logger import configurar_logger
+# from src.const import MAGIA, DATASET_PATH
+# from src.logger import configurar_logger
 
 
 def test(max_talla, n_talla):
@@ -67,9 +67,11 @@ def es_grupo_uniforme(primo, base):
 
 
 def basic_test():
-    base = 5
-    congruente = 8
-    primo = 23
+    base = 2
+    congruente = 25575
+    primo = 48947
+
+    # 16;2;25575;48947;48946;0;471.521322
 
     print(f"t tal que {base}^t ≡ {congruente} (mod {primo})")
     print(f"Calculando...")
@@ -82,4 +84,5 @@ def basic_test():
 
 
 if __name__ == "__main__":
+    basic_test()
     pass

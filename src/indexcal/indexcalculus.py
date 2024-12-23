@@ -25,11 +25,25 @@ import random
 import time
 
 import sympy
+from collections import defaultdict
 
 from src.const import MAGIA, DATASET_PATH
 from src.logger import configurar_logger
+# 2 3 5 7 11 13 17
+S = [2, 3, 5, 7, 11]
 
-S = [2, 3, 5, 7]
+def single_test():
+    n = 32
+    p = 2703258601
+    alfa = 87
+    beta = 1218285964
+    orden = 1351629300
+
+    x = index_calculus(alfa, beta, p, orden)
+
+    if pow(alfa, int(x), p) == beta:
+        print("GOOD")
+
 
 def test(max_talla, n_talla):
     logger = configurar_logger(__file__, __name__)
@@ -40,6 +54,7 @@ def test(max_talla, n_talla):
         d = json.load(j)
 
     for talla, objetos in d.items():
+        if int(talla) < max_talla: continue
         if int(talla) > max_talla: return
         c = 1
         for obj in objetos:
@@ -64,7 +79,7 @@ def test(max_talla, n_talla):
             duracion = fin - inicio
 
             logger.info(f"{n};{alfa};{beta};{p};{x};{duracion:.6f}")
-
+            
             c += 1
 
 
@@ -90,25 +105,36 @@ def is_s_smooth(n, max_p=7):
             return None
     return factores
 
+def sigue(primos_count):
+    if len(S) > len(primos_count.keys()):
+        return True
+    
+    if not all(value >= 2 for value in primos_count.values()):
+        return True
+    
+    return False
+    
 
-def build_smooths(alfa, p):
-    p_count = set()
+def build_smooths(alfa, p, orden):
+    primos_count = defaultdict(int)
+    primos_count[2] = 0 
     s_smooths = {}
-    while len(p_count) < len(S):
-        r = random.randint(1, 1000000)
-
-        x = pow(alfa, r, p)
-        f = is_s_smooth(x)
-        if f:
-            s_smooths[r] = f
-            p_count.update(list(f.keys()))
-    # s_smooths = {}
-    # for t in [7, 170, 351, 406, 408]:
-    #     x = (alfa ** t) % p
-    #     f = is_s_smooth(x)
-    #     if f:
-    #         s_smooths[t] = f
-    #         p_count.update(list(f.keys()))
+    while sigue(primos_count):
+        r = random.randint(1, orden)
+        # print(r)
+        if r not in s_smooths:
+            x = pow(alfa, r, p)
+            f = is_s_smooth(x, S[-1])
+            # print(f"x: {x} | f: {f}")
+            if f :
+                s_smooths[r] = f
+                for key in f.keys():
+                    primos_count[key] += 1
+                print("@@@@@")
+                print(s_smooths)
+    print(f"S: {S}")
+    print(f"s_smooths: {s_smooths}")
+    print(f"primos_count: {primos_count}")
     return s_smooths
 
 
@@ -143,6 +169,9 @@ def build_equations(s_smooths, orden):
     s = {}
     for key, value in solucion.items():
         s[str(key)] = value % orden
+
+    print(f"ecuaciones: {ecuaciones}")
+    print(f"solucion: {solucion}")
     return s
 
 
@@ -160,7 +189,7 @@ def solve(alfa, beta, p, orden, valores_log):
 
     # trial = 102
 
-    for _ in range(1000):
+    for _ in range(10000):
         trial = random.randrange(0, p)
         # betaalfa = (beta * (alfa ** trial)) % p
         # Exponentiación modular para calcular (alfa ** trial) % p
@@ -181,67 +210,46 @@ def solve(alfa, beta, p, orden, valores_log):
 
             resultado = eval(expresion, {}, valores_log)
             r = resultado - trial
-            try:
-                return int(r)
-            except Exception as e:
-                return None
-        else:
-            pass
+
+            return int(r)
+
 
 
 def index_calculus(alfa, beta, p, orden):
-    print(alfa)
     for intentos in range(1000):
         try:
-            print(1)
-            s_smooths = build_smooths(alfa, p)
-            print(2)
+            print(f"--- buscando los s_smooths")
+            s_smooths = build_smooths(alfa, p, orden)
+            print(f"--- construimos las ecuaciones")
             v = build_equations(s_smooths, orden)
-            print(3)
+            print(f"--- resolvemos las ecuaciones")
             result = solve(alfa, beta, p, orden, v)
-            print(4)
         except Exception as e:
-            # print(f"bbb: {e}")
+            print(f"index_calculus Exception {e}")
             result = None
-
+        print(f"result: {result}")
         if result:
             if pow(alfa, int(result), p) == beta:
+                print(f"GOOD: {result}")
                 return result
-        else:
-            pass
+    return 0
 
-    return -777
-
+# trial = 102
+# p = 421
+# alfa = 2
+# beta = 412
+# orden = 420
 
 if __name__ == "__main__":
     pass
     # Datos proporcionados
+    n = 32
+    p = 2703258601
+    alfa = 87
+    beta = 1218285964
+    orden = 1351629300
 
-    trial = 102
-    p = 421
-    alfa = 2
-    beta = 412
-    orden = 420
+    x = index_calculus(alfa, beta, p, orden)
 
-    # n = 16
-    # p = 48947
-    # alfa = 100
-    # beta = 44488
-    # orden = 24473
-
-    # n = 16
-    # p = 48947
-    # alfa = 100
-    # beta = 35391
-    # orden = 24473
-
-    # n = 8
-    # p = 229
-    # alfa = 100
-    # beta = 81
-    # orden = 114
-    # x = nnn()
-    # x = index_calculus(alfa, beta, p, orden)
-
-    # if pow(alfa, int(x), p) == beta:
-    #     print("good")
+    if pow(alfa, int(x), p) == beta:
+        print("GOOD")
