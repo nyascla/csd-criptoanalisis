@@ -1,9 +1,26 @@
 import json
 import time
 
-# from src.const import MAGIA, DATASET_PATH
-# from src.logger import configurar_logger
+from src.const import MAGIA, DATASET_PATH
+from src.logger import configurar_logger
 
+
+def single_test():
+    n = 24
+    p = 15822929
+    alfa = 3
+    beta = 12268100
+    orden = 15822928
+
+    inicio = time.time()
+
+    x = logaritmo_discreto_fuerza_bruta(alfa, beta, p)
+
+    fin = time.time()  # Registrar el tiempo final
+    duracion = fin - inicio
+
+    if pow(alfa, int(x), p) == beta:
+        print("GOOD")
 
 def test(max_talla, n_talla):
     logger = configurar_logger(__file__, __name__)
@@ -15,6 +32,8 @@ def test(max_talla, n_talla):
 
     for talla, objetos in d.items():
         if int(talla) > max_talla: return
+        if int(talla) < 36: continue
+
         c = 1
         for obj in objetos:
             if c > n_talla:
@@ -26,7 +45,7 @@ def test(max_talla, n_talla):
             alfa = obj["alfa"]
             beta = obj["beta"]
             orden = obj["orden"]
-
+            print(f"{n};{alfa};{beta};{p}")
             x = logaritmo_discreto_fuerza_bruta(alfa, beta, p)
 
             fin = time.time()  # Registrar el tiempo final

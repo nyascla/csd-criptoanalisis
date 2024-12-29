@@ -12,8 +12,8 @@ import time
 from math import gcd
 from sympy import mod_inverse
 
-# from src.const import MAGIA, DATASET_PATH
-# from src.logger import configurar_logger
+from src.const import MAGIA, DATASET_PATH
+from src.logger import configurar_logger
 
 ITERACIOENS = 5000000
 
@@ -34,12 +34,11 @@ def test(max_talla, n_talla):
             "sol": 0    
         } 
     for talla, objetos in d.items():
-        if int(talla) < max_talla:
-            continue
+        # if int(talla) < max_talla:
+        #     continue
         if int(talla) > max_talla:
             # logger.info(f"iteraciones: {ITERACIOENS} | ok: {ok} | err: {err}")
-            logger.info(f"iteraciones: {ITERACIOENS} | colisiones: {c["colision"]} | no_inv: {c["no_inv"]} | no_sol: {c["no_sol"]} | sol: {c["sol"]}")
-
+            print(f"iteraciones: {ITERACIOENS} | colisiones: {c["colision"]} | no_inv: {c["no_inv"]} | no_sol: {c["no_sol"]} | sol: {c["sol"]}")
             return
         count = 1
         for obj in objetos:
@@ -75,7 +74,7 @@ def test(max_talla, n_talla):
             count += 1
     
     
-    logger.info(f"problemas: {ok + err} | iteraciones: {ITERACIOENS} | ok: {ok} | err: {err}")
+    print(f"problemas: {ok + err} | iteraciones: {ITERACIOENS} | ok: {ok} | err: {err}")
 
 def pollard_rho_log(alpha, beta, p, orden, c):
     # Paso 1: Definir la función pseudoaleatoria

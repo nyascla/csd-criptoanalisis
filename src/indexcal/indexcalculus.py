@@ -30,7 +30,7 @@ from collections import defaultdict
 from src.const import MAGIA, DATASET_PATH
 from src.logger import configurar_logger
 # 2 3 5 7 11 13 17
-S = [2, 3, 5, 7, 11]
+S = [2, 3, 5, 7, 11, 13, 17]
 
 def single_test():
     n = 32
@@ -94,11 +94,10 @@ def exp_mod(base, exponente, mod):
     return result
 
 
-def relacion_lineal():
-    pass
 
 
-def is_s_smooth(n, max_p=7):
+
+def is_s_smooth(n, max_p):
     factores = sympy.factorint(n)  # Factoriza el número n
     for factor in factores:
         if factor > max_p:
@@ -109,7 +108,10 @@ def sigue(primos_count):
     if len(S) > len(primos_count.keys()):
         return True
     
-    if not all(value >= 2 for value in primos_count.values()):
+    if not all(value >= 1
+
+
+               for value in primos_count.values()):
         return True
     
     return False
@@ -119,19 +121,19 @@ def build_smooths(alfa, p, orden):
     primos_count = defaultdict(int)
     primos_count[2] = 0 
     s_smooths = {}
+    c = 0
     while sigue(primos_count):
         r = random.randint(1, orden)
         # print(r)
         if r not in s_smooths:
             x = pow(alfa, r, p)
             f = is_s_smooth(x, S[-1])
-            # print(f"x: {x} | f: {f}")
             if f :
                 s_smooths[r] = f
                 for key in f.keys():
                     primos_count[key] += 1
-                print("@@@@@")
-                print(s_smooths)
+                print(f"\r{c}/1000 {s_smooths}", end="")
+        c += 1
     print(f"S: {S}")
     print(f"s_smooths: {s_smooths}")
     print(f"primos_count: {primos_count}")
@@ -166,12 +168,20 @@ def build_equations(s_smooths, orden):
 
     # Resolver el sistema de ecuaciones
     solucion = sympy.solve(ecuaciones, list(variables_dict.values()))
+
+    if not solucion:
+        return
     s = {}
+    print(f"solucion types: {type(solucion)}")
+    print(f"solucion: {solucion}")
+
     for key, value in solucion.items():
         s[str(key)] = value % orden
 
     print(f"ecuaciones: {ecuaciones}")
     print(f"solucion: {solucion}")
+    print(f"s: {s}")
+
     return s
 
 
@@ -189,15 +199,13 @@ def solve(alfa, beta, p, orden, valores_log):
 
     # trial = 102
 
-    for _ in range(10000):
+    for _ in range(1000000):
         trial = random.randrange(0, p)
-        # betaalfa = (beta * (alfa ** trial)) % p
-        # Exponentiación modular para calcular (alfa ** trial) % p
-        exp_mod = pow(alfa, trial, p)
-        # Calcular el resultado final: (beta * (alfa ** trial)) % p
-        betaalfa = (beta * exp_mod) % p
 
-        betaalfa_smooth = is_s_smooth(betaalfa)
+        exp_mod = pow(alfa, trial, p)
+        betaalfa = (beta * exp_mod) % p
+        betaalfa_smooth = is_s_smooth(betaalfa, S[-1])
+
         if betaalfa_smooth:
             s = ""
             for base, exponente in betaalfa_smooth.items():
@@ -232,6 +240,8 @@ def index_calculus(alfa, beta, p, orden):
             if pow(alfa, int(result), p) == beta:
                 print(f"GOOD: {result}")
                 return result
+            else:
+                print(f"BAD: {result}")
     return 0
 
 # trial = 102
@@ -241,8 +251,12 @@ def index_calculus(alfa, beta, p, orden):
 # orden = 420
 
 if __name__ == "__main__":
-    pass
-    # Datos proporcionados
+    # n = 16
+    # p = 48947
+    # alfa = 2
+    # beta = 30855
+    # orden = 48946
+
     n = 32
     p = 2703258601
     alfa = 87
@@ -253,3 +267,30 @@ if __name__ == "__main__":
 
     if pow(alfa, int(x), p) == beta:
         print("GOOD")
+
+"""
+El último algoritmo analizado es el de Index Calculus, actualmente el más potente para resolver problemas de logaritmos discretos de mayor tamaño y el que se utiliza en escenarios prácticos para romper instancias más desafiantes. En este tipo de problemas, la mayor dificultad radica en la construcción de un sistema de ecuaciones lineales que será utilizado para despejar valores y calcular la solución final.
+Proceso General del Algoritmo
+El algoritmo se divide en dos etapas principales:
+Construcción del Sistema de Ecuaciones
+Para generar un conjunto de ecuaciones que luego resolveremos, seguimos estos pasos:
+Selección de una base de números primos: Elegimos un conjunto S de números primos, llamado la base de factorización.
+Generación de ecuaciones: Utilizamos un proceso iterativo para encontrar números que se puedan factorizar completamente en términos de los primos de S:
+while not todos los primos en las ecuaciones:
+    1. Generar un número aleatorio.
+    2. Factorizar el número.
+    3. Si es \( S \)-smooth (factorizable usando únicamente los primos en \( S \)):
+        - Aplicar logaritmos para obtener una relación lineal.
+        - Añadir una ecuación en términos de suma de logaritmos módulo el orden del grupo.
+Una vez que hemos generado suficientes ecuaciones, resolvemos el sistema lineal para obtener los logaritmos de todos los elementos en S.
+
+Resolución del Logaritmo Discreto
+Con el sistema de ecuaciones resuelto y los logaritmos de la base calculados, buscamos resolver el problema de logaritmo discreto:
+
+while no solucion:
+    1. Generar un valor \( r \) aleatorio.
+    2. if beta x alfa^random mod p es s-smooth
+- Generar la relación lineal correspondiente. 
+- Como ya conocemos los logaritmos de todos los primos en \( S \), resolver es directo:
+
+"""

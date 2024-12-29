@@ -36,6 +36,9 @@ def test(max_talla, n_talla):
             fin = time.time()  # Registrar el tiempo final
             duracion = fin - inicio
 
+            if pow(alfa, int(x), p) == beta:
+                print("GOOD")
+
             logger.info(f"{n};{alfa};{beta};{p};{x};{duracion:.6f}")
 
             c += 1
